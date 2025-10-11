@@ -1,6 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef, memo } from 'react';
 import { User } from '../types';
 import { LoadingSpinner, CheckCircleIcon } from './IconComponents';
+
+// This is a global type from the PayPal script, declare it to satisfy TypeScript
+declare global {
+    interface Window {
+        paypal: any;
+    }
+}
 
 interface PaymentModalProps {
     isOpen: boolean;
@@ -13,22 +20,63 @@ interface PaymentModalProps {
 
 const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, onConfirm, courseTitle, user, onLogout }) => {
     const [paymentState, setPaymentState] = useState<'idle' | 'processing' | 'success'>('idle');
+    const paypalButtonContainer = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (isOpen && paymentState === 'idle' && !user.isGuest && window.paypal && paypalButtonContainer.current) {
+            // Clear any existing buttons to prevent duplicates
+            paypalButtonContainer.current.innerHTML = '';
+            
+            window.paypal.Buttons({
+                createOrder: (data: any, actions: any) => {
+                    return actions.order.create({
+                        purchase_units: [{
+                            description: `Lifetime access to the "${courseTitle}" course on Geeddi`,
+                            amount: {
+                                value: '9.99', // Fixed price for demonstration
+                                currency_code: 'USD'
+                            },
+                            payee: {
+                                email_address: 'ciwaankamustafa@gmail.com' // User-provided PayPal email
+                            }
+                        }]
+                    });
+                },
+                onApprove: async (data: any, actions: any) => {
+                    setPaymentState('processing');
+                    try {
+                        const order = await actions.order.capture();
+                        console.log('Payment successful:', order);
+                        setPaymentState('success');
+                        onConfirm();
+
+                        setTimeout(() => {
+                            onClose();
+                            setTimeout(() => setPaymentState('idle'), 300); // Reset state after closing
+                        }, 2000); // Show success message for 2s
+                    } catch(err) {
+                        console.error('Failed to capture payment:', err);
+                        setPaymentState('idle'); // Return to idle on capture failure
+                    }
+                },
+                onError: (err: any) => {
+                    console.error('PayPal Checkout Error:', err);
+                    setPaymentState('idle'); // Return to idle on error
+                }
+            }).render(paypalButtonContainer.current).catch((err: any) => {
+                console.error('Failed to render PayPal buttons:', err);
+            });
+        }
+    }, [isOpen, paymentState, user.isGuest, courseTitle, onConfirm, onClose]);
+    
+    // Reset state when modal is closed to ensure it's fresh on reopen
+    useEffect(() => {
+        if (!isOpen) {
+            setPaymentState('idle');
+        }
+    }, [isOpen]);
 
     if (!isOpen) return null;
-
-    const handlePayment = (method: string) => {
-        console.log(`Payment initiated with ${method}`);
-        setPaymentState('processing');
-        setTimeout(() => {
-            setPaymentState('success');
-            onConfirm();
-            setTimeout(() => {
-                onClose();
-                // Reset state after a short delay to allow for exit animation
-                setTimeout(() => setPaymentState('idle'), 300);
-            }, 2000); // Show success message for 2s
-        }, 1500); // Simulate processing for 1.5s
-    };
 
     const renderContent = () => {
         switch (paymentState) {
@@ -37,7 +85,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, onConfirm,
                     <div className="text-center">
                         <LoadingSpinner />
                         <h3 className="text-2xl font-bold mt-4">Processing Payment...</h3>
-                        <p className="text-gray-400 mt-2">Please wait, this will only take a moment.</p>
+                        <p className="text-gray-400 mt-2">Finalizing your purchase. Please wait.</p>
                     </div>
                 );
             case 'success':
@@ -67,15 +115,17 @@ const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, onConfirm,
                 return (
                     <>
                         <h2 className="text-3xl font-bold text-center text-cyan-400">Unlock Premium Course</h2>
-                        <p className="text-center text-gray-300 mt-2 mb-6">You are purchasing access to <span className="font-bold text-white">{courseTitle}</span>.</p>
+                        <p className="text-center text-gray-300 mt-2 mb-6">You are purchasing access to <span className="font-bold text-white">{courseTitle}</span> for <span className="font-bold text-white">$9.99</span>.</p>
                         
-                        <div className="space-y-4">
-                            <button onClick={() => handlePayment('Email')} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-300 flex items-center justify-center">
-                                Pay with Email ({user.email})
-                            </button>
+                        <div className="min-h-[100px]" ref={paypalButtonContainer}>
+                           {/* PayPal buttons will render here. Show a spinner as a fallback while the SDK loads. */}
+                            <div className="text-center pt-8">
+                                <LoadingSpinner />
+                                <p className="text-sm text-gray-400 mt-2">Loading payment options...</p>
+                            </div>
                         </div>
 
-                        <button onClick={onClose} className="mt-6 w-full text-center text-sm text-gray-400 hover:text-white transition-colors">
+                        <button onClick={onClose} className="mt-2 w-full text-center text-sm text-gray-400 hover:text-white transition-colors">
                             Cancel Payment
                         </button>
                     </>
@@ -92,4 +142,4 @@ const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, onConfirm,
     );
 };
 
-export default PaymentModal;
+export default memo(PaymentModal);

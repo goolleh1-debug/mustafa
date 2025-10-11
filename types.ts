@@ -20,6 +20,7 @@ export interface Course {
 }
 
 export enum View {
+    LANDING,
     LOGIN,
     DASHBOARD,
     COURSE
@@ -47,6 +48,7 @@ export interface GeneratedCourseContent {
 export interface CourseProgress {
   quizAnswers: { [key: number]: string };
   quizSubmitted: boolean;
+  quizScore?: number;
   progressPercentage: number;
 }
 
