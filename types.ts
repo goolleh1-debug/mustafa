@@ -11,12 +11,19 @@ export enum CourseTier {
   PREMIUM = 'PREMIUM',
 }
 
+export enum CourseFormat {
+  TEXT = 'TEXT',
+  VIDEO = 'VIDEO',
+  AUDIO = 'AUDIO',
+}
+
 export interface Course {
   id: string;
   title: string;
   description: string;
   tier: CourseTier;
   icon: React.ReactNode;
+  format: CourseFormat;
 }
 
 export enum View {
@@ -54,4 +61,10 @@ export interface CourseProgress {
 
 export interface UserProgress {
   [courseId: string]: CourseProgress;
+}
+
+export interface UserData {
+  signUpDate: string; // ISO string
+  isFullyActivated: boolean;
+  progress: UserProgress;
 }

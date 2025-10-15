@@ -1,51 +1,58 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Course, GeneratedCourseContent, User, CourseProgress } from '../types';
+import { Course, GeneratedCourseContent, User, CourseProgress, CourseFormat } from '../types';
 import { generateCourseContent } from '../services/geminiService';
-import { LoadingSpinner, LockIcon, CheckCircleIcon, CertificateIcon } from './IconComponents';
-import PaymentModal from './PaymentModal';
+import { LoadingSpinner, CheckCircleIcon, CertificateIcon } from './IconComponents';
 import Certificate from './Certificate';
+import { useTranslation } from '../useTranslation';
 
 interface CourseViewProps {
   course: Course;
   user: User;
-  isLocked: boolean;
-  onUnlock: (courseId: string) => void;
   onBack: () => void;
-  onLogout: () => void;
   initialProgress: CourseProgress | undefined;
   onSaveProgress: (courseId: string, progress: CourseProgress) => void;
 }
 
 const PASSING_SCORE = 75;
 
-const CourseView: React.FC<CourseViewProps> = ({ course, user, isLocked, onUnlock, onBack, onLogout, initialProgress, onSaveProgress }) => {
+const CourseView: React.FC<CourseViewProps> = ({ course, user, onBack, initialProgress, onSaveProgress }) => {
   const [content, setContent] = useState<GeneratedCourseContent | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [showUnlockBenefits, setShowUnlockBenefits] = useState(false);
   const [showCertificate, setShowCertificate] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState<string>('');
   
   const [selectedAnswers, setSelectedAnswers] = useState<{[key: number]: string}>(() => initialProgress?.quizAnswers || {});
   const [showResults, setShowResults] = useState<boolean>(() => initialProgress?.quizSubmitted || false);
   const [quizScore, setQuizScore] = useState<number>(() => initialProgress?.quizScore ?? -1);
+  const t = useTranslation();
 
   const fetchContent = useCallback(async () => {
-    if (isLocked) {
-      setIsLoading(false);
-      return;
-    }
     setIsLoading(true);
     setError(null);
+    
+    const timeouts: number[] = [];
+    const clearTimeouts = () => timeouts.forEach(clearTimeout);
+
+    // Set up detailed progress messages for media formats
+    if (course.format === CourseFormat.VIDEO || course.format === CourseFormat.AUDIO) {
+      setLoadingMessage(t('generatingIntroduction'));
+      timeouts.push(window.setTimeout(() => setLoadingMessage(t('creatingModules')), 2000));
+      timeouts.push(window.setTimeout(() => setLoadingMessage(t('craftingQuiz')), 4000));
+    } else {
+      setLoadingMessage(t('generatingCourse'));
+    }
+    
     try {
-      const generatedContent = await generateCourseContent(course.title);
+      const generatedContent = await generateCourseContent(course.title, course.format);
       setContent(generatedContent);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An unknown error occurred.');
+      setError(err instanceof Error ? err.message : t('unknownError'));
     } finally {
+      clearTimeouts();
       setIsLoading(false);
     }
-  }, [course.title, isLocked]);
+  }, [course.title, course.format, t]);
 
   useEffect(() => {
     fetchContent();
@@ -70,14 +77,6 @@ const CourseView: React.FC<CourseViewProps> = ({ course, user, isLocked, onUnloc
     onSaveProgress(course.id, newProgress);
 
   }, [selectedAnswers, showResults, quizScore, course.id, content, isLoading, onSaveProgress]);
-
-  const handleUnlock = useCallback(() => {
-    onUnlock(course.id);
-  }, [onUnlock, course.id]);
-
-  const handleCloseModal = useCallback(() => {
-    setIsModalOpen(false);
-  }, []);
   
   const handleAnswerSelect = (questionIndex: number, option: string) => {
     setSelectedAnswers(prev => ({ ...prev, [questionIndex]: option }));
@@ -94,11 +93,40 @@ const CourseView: React.FC<CourseViewProps> = ({ course, user, isLocked, onUnloc
     setShowResults(true);
   };
 
+  const renderMedia = () => {
+    if(course.format === CourseFormat.VIDEO) {
+        return (
+             <div className="aspect-w-16 aspect-h-9 mb-8 bg-black rounded-lg overflow-hidden shadow-lg">
+                <iframe 
+                    src="https://www.youtube.com/embed/S_QyEZ8v1F4?si=PZ1b98p-Fk0L-8Uu" // Placeholder AI/Tech video
+                    title="YouTube video player" 
+                    frameBorder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowFullScreen
+                    className="w-full h-full"
+                ></iframe>
+            </div>
+        )
+    }
+     if(course.format === CourseFormat.AUDIO) {
+        return (
+             <div className="mb-8 bg-gray-800 p-4 rounded-lg shadow-lg">
+                <audio controls className="w-full">
+                    {/* Placeholder audio */}
+                    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg" />
+                    {t('browserNoSupportAudio')}
+                </audio>
+            </div>
+        )
+    }
+    return null;
+  }
+
   if (isLoading) {
     return (
       <div className="text-center py-20">
         <LoadingSpinner />
-        <p className="mt-4 text-lg text-gray-400">Generating your personalized course...</p>
+        <p className="mt-4 text-lg text-gray-400">{loadingMessage}</p>
       </div>
     );
   }
@@ -106,71 +134,12 @@ const CourseView: React.FC<CourseViewProps> = ({ course, user, isLocked, onUnloc
   if (error) {
     return (
       <div className="text-center py-20 bg-red-900/20 p-8 rounded-lg">
-        <h3 className="text-2xl font-bold text-red-400">Failed to Load Course</h3>
+        <h3 className="text-2xl font-bold text-red-400">{t('failedToLoadCourse')}</h3>
         <p className="text-red-300 mt-2">{error}</p>
         <button onClick={onBack} className="mt-6 bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 px-6 rounded-lg transition-colors">
-          Back to Dashboard
+          {t('backToDashboard')}
         </button>
       </div>
-    );
-  }
-
-  if (isLocked) {
-    return (
-      <>
-        {showUnlockBenefits ? (
-          <div className="text-center max-w-2xl mx-auto p-10 bg-gray-800 rounded-2xl shadow-xl animate-fade-in">
-              <h3 className="text-3xl font-bold text-cyan-400">Unlock Your Potential</h3>
-              <p className="text-gray-300 mt-2 mb-8">Here's what you get when you unlock <span className="font-bold text-white">{course.title}</span>:</p>
-              <ul className="text-left space-y-4 text-gray-300 mb-8 max-w-md mx-auto">
-                  <li className="flex items-start">
-                      <CheckCircleIcon className="h-6 w-6 text-green-400 mr-3 flex-shrink-0 mt-1" />
-                      <span>Full access to all in-depth modules and future updates.</span>
-                  </li>
-                  <li className="flex items-start">
-                      <CheckCircleIcon className="h-6 w-6 text-green-400 mr-3 flex-shrink-0 mt-1" />
-                      <span>Interactive quizzes to solidify your knowledge.</span>
-                  </li>
-                  <li className="flex items-start">
-                      <CheckCircleIcon className="h-6 w-6 text-green-400 mr-3 flex-shrink-0 mt-1" />
-                      <span>Save your progress and continue learning anytime.</span>
-                  </li>
-                  <li className="flex items-start">
-                      <CheckCircleIcon className="h-6 w-6 text-green-400 mr-3 flex-shrink-0 mt-1" />
-                      <span>One-time payment for lifetime access. No subscriptions!</span>
-                  </li>
-              </ul>
-              <button onClick={() => setIsModalOpen(true)} className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg transition-colors text-lg">
-                  Proceed to Payment
-              </button>
-              <button onClick={() => setShowUnlockBenefits(false)} className="mt-4 block w-full text-center text-gray-400 hover:text-white">
-                  Go Back
-              </button>
-          </div>
-        ) : (
-          <div className="text-center max-w-2xl mx-auto p-10 bg-gray-800 rounded-2xl shadow-xl animate-fade-in">
-              <LockIcon className="h-12 w-12 text-yellow-400 mx-auto" />
-              <h3 className="text-3xl font-bold mt-4 text-yellow-300">Premium Course Locked</h3>
-              <p className="text-gray-300 mt-2 mb-6">
-                This course requires a one-time purchase to unlock all modules and quizzes.
-              </p>
-              <button onClick={() => setShowUnlockBenefits(true)} className="bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-3 px-8 rounded-lg transition-colors text-lg">
-                Learn More & Unlock
-              </button>
-              <button onClick={onBack} className="mt-4 block w-full text-center text-cyan-400 hover:text-cyan-300">
-                Back to Dashboard
-              </button>
-          </div>
-        )}
-        <PaymentModal
-          isOpen={isModalOpen}
-          onClose={handleCloseModal}
-          onConfirm={handleUnlock}
-          courseTitle={course.title}
-          user={user}
-          onLogout={onLogout}
-        />
-      </>
     );
   }
 
@@ -178,9 +147,12 @@ const CourseView: React.FC<CourseViewProps> = ({ course, user, isLocked, onUnloc
     <>
       <div className="max-w-4xl mx-auto animate-fade-in">
         <button onClick={onBack} className="mb-8 text-cyan-400 hover:text-cyan-300 font-semibold">
-          &larr; Back to Dashboard
+          &larr; {t('backToDashboard')}
         </button>
         <h2 className="text-5xl font-extrabold mb-4 text-white">{course.title}</h2>
+        
+        {renderMedia()}
+        
         <p className="text-xl text-gray-400 mb-8">{content?.introduction}</p>
 
         <div className="space-y-8">
@@ -196,12 +168,12 @@ const CourseView: React.FC<CourseViewProps> = ({ course, user, isLocked, onUnloc
         </div>
         
         <div className="bg-gray-800 p-6 rounded-lg mt-12">
-          <h3 className="text-2xl font-bold text-cyan-400 mb-3">Summary</h3>
+          <h3 className="text-2xl font-bold text-cyan-400 mb-3">{t('summary')}</h3>
           <p className="text-gray-300">{content?.summary}</p>
         </div>
 
         <div className="bg-gray-800 p-6 rounded-lg mt-8">
-          <h3 className="text-3xl font-bold text-cyan-400 mb-6">Test Your Knowledge</h3>
+          <h3 className="text-3xl font-bold text-cyan-400 mb-6">{t('testYourKnowledge')}</h3>
           <div className="space-y-6">
             {content?.quiz.map((q, index) => {
               const isCorrect = showResults && selectedAnswers[index] === q.correctAnswer;
@@ -232,7 +204,7 @@ const CourseView: React.FC<CourseViewProps> = ({ course, user, isLocked, onUnloc
                     })}
                   </div>
                   {showResults && !isCorrect && (
-                    <p className="text-sm mt-3 text-yellow-400">Correct Answer: {q.correctAnswer}</p>
+                    <p className="text-sm mt-3 text-yellow-400">{t('correctAnswer')}: {q.correctAnswer}</p>
                   )}
                 </div>
               );
@@ -240,25 +212,25 @@ const CourseView: React.FC<CourseViewProps> = ({ course, user, isLocked, onUnloc
           </div>
           {!showResults && (
               <button onClick={submitQuiz} className="mt-8 bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-3 px-8 rounded-lg transition-colors text-lg">
-                  Submit Answers
+                  {t('submitAnswers')}
               </button>
           )}
           {showResults && (
             <div className="mt-8 text-center p-6 bg-gray-900 rounded-lg">
-              <h4 className="text-2xl font-bold text-white">Your Score: <span className={quizScore >= PASSING_SCORE ? 'text-green-400' : 'text-red-400'}>{quizScore}%</span></h4>
+              <h4 className="text-2xl font-bold text-white">{t('yourScore')}: <span className={quizScore >= PASSING_SCORE ? 'text-green-400' : 'text-red-400'}>{quizScore}%</span></h4>
               {quizScore >= PASSING_SCORE ? (
                 <>
-                  <p className="text-green-400 mt-2 font-semibold">Congratulations, you passed!</p>
+                  <p className="text-green-400 mt-2 font-semibold">{t('congratulationsPassed')}</p>
                   <button 
                     onClick={() => setShowCertificate(true)}
                     className="mt-6 inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition-colors text-lg"
                   >
                     <CertificateIcon className="h-6 w-6" />
-                    View Certificate
+                    {t('viewCertificate')}
                   </button>
                 </>
               ) : (
-                <p className="text-yellow-400 mt-2">You need a score of {PASSING_SCORE}% or higher to receive a certificate. Please review the material and feel free to retake the quiz.</p>
+                <p className="text-yellow-400 mt-2">{t('passingScoreInfo', { score: PASSING_SCORE })}</p>
               )}
             </div>
           )}

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { User } from '../types';
 import { BrainIcon } from './IconComponents';
+import { useTranslation } from '../useTranslation';
 
 interface LoginScreenProps {
   onLogin: (user: User) => void;
@@ -8,12 +9,13 @@ interface LoginScreenProps {
 
 const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
   const [email, setEmail] = useState('');
+  const t = useTranslation();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (email) {
       onLogin({
-        name: 'Demo User',
+        name: t('demoUser'),
         email,
       });
     }
@@ -21,7 +23,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
 
   const handleGuestLogin = () => {
     onLogin({
-      name: 'Guest',
+      name: t('guest'),
       email: '',
       isGuest: true,
     });
@@ -34,13 +36,13 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
             <div className="flex justify-center mb-4">
                <BrainIcon />
             </div>
-          <h1 className="text-3xl font-extrabold text-cyan-400">Welcome to Geeddi</h1>
-          <p className="mt-2 text-gray-400">Your journey into the future starts here at the AI Learning Academy.</p>
+          <h1 className="text-3xl font-extrabold text-cyan-400">{t('welcomeToGeeddi')}</h1>
+          <p className="mt-2 text-gray-400">{t('loginTagline')}</p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm">
             <div>
-              <label htmlFor="email-address" className="sr-only">Email address</label>
+              <label htmlFor="email-address" className="sr-only">{t('emailAddress')}</label>
               <input
                 id="email-address"
                 name="email"
@@ -48,7 +50,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
                 autoComplete="email"
                 required
                 className="appearance-none rounded-md relative block w-full px-3 py-3 border border-gray-700 bg-gray-900 placeholder-gray-500 text-white focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 focus:z-10 sm:text-sm"
-                placeholder="Email address"
+                placeholder={t('emailAddress')}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
@@ -60,7 +62,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
               type="submit"
               className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 focus:ring-offset-gray-900 transition-colors duration-300"
             >
-              Sign In & Start Learning
+              {t('signInAndStartLearning')}
             </button>
           </div>
         </form>
@@ -70,7 +72,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
                 <div className="w-full border-t border-gray-700"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-gray-800 text-gray-500">Or</span>
+                <span className="px-2 bg-gray-800 text-gray-500">{t('or')}</span>
             </div>
         </div>
         
@@ -80,7 +82,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
               onClick={handleGuestLogin}
               className="group relative w-full flex justify-center py-3 px-4 border border-gray-600 text-sm font-medium rounded-md text-white bg-gray-700 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 focus:ring-offset-gray-900 transition-colors duration-300"
             >
-              Continue as Guest
+              {t('continueAsGuest')}
             </button>
         </div>
       </div>

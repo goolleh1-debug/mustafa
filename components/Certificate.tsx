@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import { User, Course } from '../types';
+import { useTranslation } from '../useTranslation';
 
 interface CertificateProps {
   user: User;
@@ -9,6 +10,7 @@ interface CertificateProps {
 
 const Certificate: React.FC<CertificateProps> = ({ user, course, onClose }) => {
   const svgRef = useRef<SVGSVGElement>(null);
+  const t = useTranslation();
 
   const downloadCertificate = () => {
     if (!svgRef.current) return;
@@ -42,7 +44,7 @@ const Certificate: React.FC<CertificateProps> = ({ user, course, onClose }) => {
     img.src = `data:image/svg+xml;base64,${svgBase64}`;
   };
 
-  const completionDate = new Date().toLocaleDateString('en-US', {
+  const completionDate = new Date().toLocaleDateString(t('locale'), {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
@@ -63,17 +65,17 @@ const Certificate: React.FC<CertificateProps> = ({ user, course, onClose }) => {
             <rect x="20" y="20" width="760" height="560" fill="none" stroke="#c0a062" strokeWidth="8" />
             
             <text x="400" y="80" textAnchor="middle" fontSize="24" fill="#555" style={{ fontFamily: 'Georgia, serif' }}>
-              Geeddi AI Learning Academy
+              {t('appFullName')}
             </text>
             
             <text x="400" y="160" textAnchor="middle" fontSize="48" fill="#333" fontWeight="bold" style={{ fontFamily: 'Georgia, serif', letterSpacing: '2px' }}>
-              CERTIFICATE of COMPLETION
+              {t('certificateOfCompletion')}
             </text>
 
             <rect x="150" y="180" width="500" height="2" fill="#c0a062" />
             
             <text x="400" y="230" textAnchor="middle" fontSize="22" fill="#555" fontStyle="italic" style={{ fontFamily: 'Georgia, serif' }}>
-              This certifies that
+              {t('certifiesThat')}
             </text>
             
             <text x="400" y="310" textAnchor="middle" fontSize="44" fill="#000" fontWeight="bold" style={{ fontFamily: 'Georgia, serif' }}>
@@ -81,7 +83,7 @@ const Certificate: React.FC<CertificateProps> = ({ user, course, onClose }) => {
             </text>
 
             <text x="400" y="360" textAnchor="middle" fontSize="22" fill="#555" fontStyle="italic" style={{ fontFamily: 'Georgia, serif' }}>
-              has successfully completed the course
+              {t('successfullyCompleted')}
             </text>
             
             <text x="400" y="420" textAnchor="middle" fontSize="32" fill="#333" fontWeight="bold" style={{ fontFamily: 'Georgia, serif' }}>
@@ -92,13 +94,13 @@ const Certificate: React.FC<CertificateProps> = ({ user, course, onClose }) => {
               {completionDate}
             </text>
             <rect x="100" y="490" width="200" height="1.5" fill="#555" />
-            <text x="200" y="505" textAnchor="middle" fontSize="14" fill="#555">Date</text>
+            <text x="200" y="505" textAnchor="middle" fontSize="14" fill="#555">{t('date')}</text>
             
             <text x="600" y="520" textAnchor="middle" fontSize="18" fill="#555" style={{ fontFamily: 'Georgia, serif' }}>
               Geeddi Academy
             </text>
             <rect x="500" y="490" width="200" height="1.5" fill="#555" />
-            <text x="600" y="505" textAnchor="middle" fontSize="14" fill="#555">Issuing Authority</text>
+            <text x="600" y="505" textAnchor="middle" fontSize="14" fill="#555">{t('issuingAuthority')}</text>
           </svg>
         </div>
         <div className="text-center p-4 border-t border-gray-700">
@@ -106,7 +108,7 @@ const Certificate: React.FC<CertificateProps> = ({ user, course, onClose }) => {
             onClick={downloadCertificate}
             className="bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 px-6 rounded-lg transition-colors"
           >
-            Download as PNG
+            {t('downloadAsPNG')}
           </button>
         </div>
       </div>

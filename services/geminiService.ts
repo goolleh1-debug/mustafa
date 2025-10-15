@@ -1,6 +1,6 @@
 
 import { GoogleGenAI, Type } from "@google/genai";
-import { GeneratedCourseContent } from '../types';
+import { GeneratedCourseContent, CourseFormat } from '../types';
 
 if (!process.env.API_KEY) {
   throw new Error("API_KEY environment variable is not set");
@@ -27,7 +27,7 @@ const courseContentSchema = {
           },
           content: { 
             type: Type.STRING, 
-            description: 'The main educational content for the module. Use paragraphs and bullet points for clarity. Explain the concept in detail. This should be comprehensive.'
+            description: 'The main educational content for the module. Use paragraphs and bullet points for clarity. Explain the concept in detail. This should be comprehensive. For video/audio formats, this should be a script.'
           },
           estimatedTime: {
             type: Type.STRING,
@@ -69,11 +69,17 @@ const courseContentSchema = {
 };
 
 
-export const generateCourseContent = async (topic: string): Promise<GeneratedCourseContent> => {
+export const generateCourseContent = async (topic: string, format: CourseFormat): Promise<GeneratedCourseContent> => {
+  let prompt = `Generate a detailed educational course about "${topic}". The target audience is beginners in technology. The tone should be informative, accessible, and engaging. Please provide a comprehensive overview with practical examples where possible.`;
+
+  if (format === CourseFormat.VIDEO || format === CourseFormat.AUDIO) {
+    prompt = `Generate a script for an educational ${format === CourseFormat.VIDEO ? 'video' : 'audio segment'} about "${topic}". The target audience is beginners in technology. The tone should be informative, accessible, and engaging. Structure the content into an introduction, 3-5 modules with clear titles, and a summary. The 'content' for each module should be the narration script. Also, create a 3-question multiple-choice quiz based on the script content.`;
+  }
+  
   try {
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
-      contents: `Generate a detailed educational course about "${topic}". The target audience is beginners in technology. The tone should be informative, accessible, and engaging. Please provide a comprehensive overview with practical examples where possible.`,
+      contents: prompt,
       config: {
         responseMimeType: "application/json",
         responseSchema: courseContentSchema,
@@ -83,7 +89,6 @@ export const generateCourseContent = async (topic: string): Promise<GeneratedCou
     const jsonText = response.text.trim();
     const courseData = JSON.parse(jsonText);
 
-    // Basic validation to ensure the parsed object matches the expected structure.
     if (!courseData.introduction || !Array.isArray(courseData.modules) || !courseData.summary || !Array.isArray(courseData.quiz)) {
         throw new Error("Generated content does not match the expected schema.");
     }

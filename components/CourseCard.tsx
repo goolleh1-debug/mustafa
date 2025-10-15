@@ -1,15 +1,29 @@
 import React from 'react';
-import { Course, CourseTier } from '../types';
-import { LockIcon } from './IconComponents';
+import { Course, CourseTier, CourseFormat } from '../types';
+import { useTranslation } from '../useTranslation';
 
 interface CourseCardProps {
   course: Course;
-  isLocked: boolean;
   onClick: () => void;
   progress: number;
 }
 
-const CourseCard: React.FC<CourseCardProps> = ({ course, isLocked, onClick, progress }) => {
+const CourseCard: React.FC<CourseCardProps> = ({ course, onClick, progress }) => {
+  const t = useTranslation();
+
+  const getFormatTag = () => {
+    switch(course.format) {
+      case CourseFormat.VIDEO:
+        return <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-red-900 text-red-300">{t('video')}</span>;
+      case CourseFormat.AUDIO:
+        return <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-orange-900 text-orange-300">{t('audio')}</span>;
+      case CourseFormat.TEXT:
+         return <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-900 text-blue-300">{t('text')}</span>;
+      default:
+        return <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-cyan-900 text-cyan-300">{t('free')}</span>;
+    }
+  }
+
   return (
     <div
       onClick={onClick}
@@ -19,19 +33,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, isLocked, onClick, prog
         <div>
           <div className="flex justify-between items-start">
               {course.icon}
-              {course.tier === CourseTier.PREMIUM && (
-                  <span className={`flex items-center text-xs font-semibold px-2.5 py-1 rounded-full ${
-                      isLocked ? 'bg-yellow-900 text-yellow-300' : 'bg-green-900 text-green-300'
-                  }`}>
-                      {isLocked ? <LockIcon className="h-4 w-4 mr-1" /> : null}
-                      PREMIUM
-                  </span>
-              )}
-              {course.tier === CourseTier.FREE && (
-                  <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-cyan-900 text-cyan-300">
-                      FREE
-                  </span>
-              )}
+              {getFormatTag()}
           </div>
           <h3 className="text-xl font-bold mt-4 text-white">{course.title}</h3>
           <p className="text-gray-400 mt-2 text-sm">{course.description}</p>
@@ -39,7 +41,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, isLocked, onClick, prog
         
         <div className="mt-auto pt-4">
             <div className="flex justify-between items-center text-xs mb-1">
-                <span className="font-semibold text-gray-400">Progress</span>
+                <span className="font-semibold text-gray-400">{t('progress')}</span>
                 <span className="font-bold text-white">{progress}%</span>
             </div>
             <div className="w-full bg-gray-700 rounded-full h-1.5">
@@ -49,7 +51,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, isLocked, onClick, prog
       </div>
 
       <div className="bg-gray-900/50 px-6 py-3 text-cyan-400 font-semibold text-sm">
-        Start Learning &rarr;
+        {t('startLearningArrow')}
       </div>
     </div>
   );
