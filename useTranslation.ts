@@ -4,6 +4,7 @@ import { LanguageContext } from './LanguageContext';
 const en = {
   // General
   "or": "Or",
+  "and": "and",
   "progress": "Progress",
   "summary": "Summary",
   "date": "Date",
@@ -11,7 +12,16 @@ const en = {
   "audio": "AUDIO",
   "text": "TEXT",
   "free": "FREE",
+  "premium": "PREMIUM",
   "locale": "en-US",
+  "learner": "Valued Learner",
+  "activate": "Activate",
+  "introduction": "Introduction",
+  "quiz": "Quiz",
+  "previous": "Previous",
+  "next": "Next",
+  "startQuiz": "Start Quiz",
+  "courseOutline": "Course Outline",
 
   // Landing Page
   "heroTitle": "The Future of Learning is Here.",
@@ -32,7 +42,7 @@ const en = {
   
   // Login
   "welcomeToGeeddi": "Welcome to Geeddi",
-  "loginTagline": "Your journey into the future starts here at the AI Learning Academy.",
+  "loginTagline": "Your personalized AI learning journey starts here.",
   "emailAddress": "Email address",
   "signInAndStartLearning": "Sign In & Start Learning",
   "continueAsGuest": "Continue as Guest",
@@ -43,36 +53,21 @@ const en = {
   "appSubtitle": "AI Learning Academy",
   "appFullName": "Geeddi - AI Learning Academy",
   "logout": "Logout",
-  "guestAccount": "Guest Account",
-  "fullAccess": "Full Access",
-  "trialDaysRemaining": "{days} trial days remaining",
   
   // Dashboard
   "welcomeBack": "Welcome, {name}!",
   "dashboardSubtitle": "Choose a topic and start your learning adventure.",
   "startLearningArrow": "Start Learning →",
-  "createYourOwnCourse": "Create Your Own Course",
-  "createCourseDescription": "Let our AI generate a custom course for you on any topic.",
+  "unlockCourse": "Unlock Course →",
   "searchPlaceholder": "Search for courses...",
   "noCoursesFound": "No courses found matching your search.",
-
-  // Create Course Modal
-  "createCourseModalTitle": "Create a New Course",
-  "createCourseModalPrompt": "Enter a topic and select the desired format for your new course.",
-  "courseTopic": "Course Topic",
-  "courseTopicPlaceholder": "e.g., 'The Basics of Quantum Computing'",
-  "courseFormat": "Course Format",
-  "textFormat": "Text-based",
-  "videoFormat": "Video (Script)",
-  "audioFormat": "Audio (Script)",
-  "createCourseButton": "Create Course",
-  "aiGeneratedCourseDescription": "An AI-generated course on the topic of \"{topic}\".",
 
   // Course View
   "generatingCourse": "Generating your personalized course...",
   "generatingIntroduction": "Generating introduction...",
   "creatingModules": "Creating modules...",
   "craftingQuiz": "Crafting quiz...",
+  "generatingAudio": "Generating course audio...",
   "failedToLoadCourse": "Failed to Load Course",
   "unknownError": "An unknown error occurred.",
   "backToDashboard": "Back to Dashboard",
@@ -84,6 +79,9 @@ const en = {
   "passingScoreInfo": "You need a score of {score}% or higher to receive a certificate. Please review the material and feel free to retake the quiz.",
   "correctAnswer": "Correct Answer",
   "browserNoSupportAudio": "Your browser does not support the audio element.",
+  "sources": "Sources",
+  "apiRateLimitError": "The AI service is currently experiencing high traffic. Please wait a moment and try again.",
+  "apiRetryMessage": "API is busy. Retrying in {seconds}s... (Attempt {attempt} of {max})",
   
   // Certificate
   "certificateOfCompletion": "CERTIFICATE of COMPLETION",
@@ -92,18 +90,29 @@ const en = {
   "issuingAuthority": "Issuing Authority",
   "downloadAsPNG": "Download as PNG",
 
-  // Activation Flow
-  "trialExpired": "Your 14-day trial has ended.",
-  "requestAccessInstruction": "To continue learning, please request an activation code by sending an email with your registered user details to:",
-  "and": "and",
-  "requestAccessCTA": "Request Full Access via Email",
+  // Request Access View
+  "trialExpired": "Full Access Required",
+  "requestAccessInstruction": "To continue using the full features of the Geeddi app, please request an activation code by sending an email to:",
+  "requestAccessCTA": "Request Access Code",
   "alreadyHaveCode": "Already have a code?",
-  "enterCodeHere": "Enter Code Here",
+  "enterCodeHere": "Enter code here",
+  
+  // Enter Code Modal
+  "invalidCode": "The code you entered is invalid. Please try again.",
   "enterActivationCode": "Enter Activation Code",
-  "enterCodePrompt": "Please enter the code you received via email to unlock full access.",
+  "enterCodePrompt": "Please enter the activation code you received to unlock the full app.",
   "activationCode": "Activation Code",
-  "activate": "Activate",
-  "invalidCode": "Invalid code. Please try again.",
+
+  // Create Course Modal
+  "createCourseModalTitle": "Create a New Course",
+  "createCourseModalPrompt": "What topic would you like to learn about? Our AI will generate a custom course for you.",
+  "courseTopic": "Course Topic",
+  "courseTopicPlaceholder": "e.g., 'Quantum Computing Basics'",
+  "courseFormat": "Course Format",
+  "textFormat": "Text",
+  "videoFormat": "Video",
+  "audioFormat": "Audio",
+  "createCourseButton": "Create Course",
 
   // Footer
   "footerRights": "Geeddi AI Learning Academy. All Rights Reserved.",
@@ -113,6 +122,7 @@ const en = {
 const so: typeof en = {
   // General
   "or": "Ama",
+  "and": "iyo",
   "progress": "Horumar",
   "summary": "Soo Koobid",
   "date": "Taariikh",
@@ -120,8 +130,17 @@ const so: typeof en = {
   "audio": "MAQAL",
   "text": "QORAAL",
   "free": "BILAASH",
+  "premium": "QIIMO",
   "locale": "so-SO",
-  
+  "learner": "Arday Qaali ah",
+  "activate": "Kici",
+  "introduction": "Hordhac",
+  "quiz": "Imtixaan",
+  "previous": "Hore",
+  "next": "Xiga",
+  "startQuiz": "Bilow Imtixaanka",
+  "courseOutline": "Dulmarka Kooraska",
+
   // Landing Page
   "heroTitle": "Mustaqbalka Barashada Waa Halkan.",
   "heroSubtitle": "Ku soo dhawoow Geeddi, akadeemiyada AI-ku shaqeysa halkaas oo waxbarashada teknoolojiyaddu ay had iyo jeer tahay mid casri ah, xiiso leh, oo adiga laguu talagalay.",
@@ -141,47 +160,32 @@ const so: typeof en = {
   
   // Login
   "welcomeToGeeddi": "Ku Soo Dhawoow Geeddi",
-  "loginTagline": "Safarakaaga mustaqbalka halkan ayuu ka bilaabmayaa akadeemiyada barashada AI.",
-  "emailAddress": "Ciwaanka iimaylka",
+  "loginTagline": "Safarkaaga waxbarasho ee AI-ga ah halkan ayuu ka bilaabmayaa.",
+  "emailAddress": "Ciwaanka emailka",
   "signInAndStartLearning": "Soo Gal & Barasho Bilow",
   "continueAsGuest": "Sii Wad Marti Ahaan",
-  "demoUser": "Isticmaale Tusaale ah",
+  "demoUser": "Isticmaale Tijaabo ah",
   "guest": "Marti",
 
   // Header
   "appSubtitle": "Akadeemiyada Barashada AI",
   "appFullName": "Geeddi - Akadeemiyada Barashada AI",
   "logout": "Ka Bax",
-  "guestAccount": "Akoon Marti ah",
-  "fullAccess": "Helitaan Buuxa",
-  "trialDaysRemaining": "{days} maalmood oo tijaabo ah ayaa kaaga hadhay",
   
   // Dashboard
   "welcomeBack": "Soo dhawoow, {name}!",
   "dashboardSubtitle": "Dooro mawduuc oo bilow safarkaaga waxbarasho.",
   "startLearningArrow": "Barasho Bilow →",
-  "createYourOwnCourse": "Samee Kooras Adiga kuu Gaar ah",
-  "createCourseDescription": "U oggolow AI-gayagu inuu kuu soo saaro kooras gaar ah oo ku saabsan mawduuc kasta.",
+  "unlockCourse": "Fur Kooraska →",
   "searchPlaceholder": "Raadi koorsooyin...",
   "noCoursesFound": "Lama helin koorsooyin u dhigma raadintaada.",
-
-  // Create Course Modal
-  "createCourseModalTitle": "Abuur Kooras Cusub",
-  "createCourseModalPrompt": "Geli mawduuc oo dooro qaabka la rabo ee koorsadaada cusub.",
-  "courseTopic": "Mawduuca Kooraska",
-  "courseTopicPlaceholder": "tusaale, 'Aasaaska Quantum Computing'",
-  "courseFormat": "Qaabka Kooraska",
-  "textFormat": "Qoraal ku salaysan",
-  "videoFormat": "Muuqaal (Qoraal)",
-  "audioFormat": "Maqal (Qoraal)",
-  "createCourseButton": "Abuur Kooras",
-  "aiGeneratedCourseDescription": "Kooras ay AI soo saartay oo ku saabsan mawduuca \"{topic}\".",
 
   // Course View
   "generatingCourse": "Waxaa lagu diyaarinayaa koorsadaada gaarka ah...",
   "generatingIntroduction": "Diyaarinta hordhaca...",
   "creatingModules": "Abuurista cutubyada...",
   "craftingQuiz": "Samaynta imtixaanka...",
+  "generatingAudio": "Waxaa la diyaarinayaa codka koorsada...",
   "failedToLoadCourse": "Lama Soo Rarin Karin Kooraska",
   "unknownError": "Cilad aan la aqoon ayaa dhacday.",
   "backToDashboard": "Ku Laabo Hoolka Weyn",
@@ -193,6 +197,9 @@ const so: typeof en = {
   "passingScoreInfo": "Waxaad u baahan tahay dhibco ah {score}% ama ka badan si aad u hesho shahaado. Fadlan dib u eeg maadada oo xor u noqo inaad imtixaanka mar kale gasho.",
   "correctAnswer": "Jawaabta Saxda ah",
   "browserNoSupportAudio": "Barowsarkaagu ma taageerayo codka.",
+  "sources": "Xigashooyin",
+  "apiRateLimitError": "Adeegga AI wuxuu hadda la kulmayaa mashquul badan. Fadlan sug wax yar oo mar kale isku day.",
+  "apiRetryMessage": "API-gu wuu mashquul yahay. Waxaa la isku dayayaa mar kale {seconds}s gudahood... (Isku day {attempt} of {max})",
   
   // Certificate
   "certificateOfCompletion": "SHAHHAADADA DHAMMAYSTIRKA",
@@ -200,19 +207,30 @@ const so: typeof en = {
   "successfullyCompleted": "uu si guul leh u dhammeeyey koorsada",
   "issuingAuthority": "Hay'adda Bixisay",
   "downloadAsPNG": "La Deg PNG Ahaan",
-
-  // Activation Flow
-  "trialExpired": "Muddadii tijaabadaada ee 14-ka maalmood ahayd way dhammaatay.",
-  "requestAccessInstruction": "Si aad u sii wadato barashada, fadlan ka codso koodka kicinta adigoo iimayl u diraya faahfaahinta isticmaalahaaga diiwaangashan cinwaanadan:",
-  "and": "iyo",
-  "requestAccessCTA": "Codso Helitaan Buuxa (Email)",
+  
+  // Request Access View
+  "trialExpired": "Waxaa Loo Baahan Yahay Ogolaansho Buuxda",
+  "requestAccessInstruction": "Si aad u sii waddo isticmaalka dhammaan qaybaha abka Geeddi, fadlan codso koodka kicinta adigoo iimayl u diraya:",
+  "requestAccessCTA": "Codso Koodka Ogolaanshaha",
   "alreadyHaveCode": "Hore ma u haysataa kood?",
-  "enterCodeHere": "Halkan Geli Koodka",
+  "enterCodeHere": "Halkan geli koodka",
+  
+  // Enter Code Modal
+  "invalidCode": "Koodka aad gelisay waa sax aheyn. Fadlan isku day mar kale.",
   "enterActivationCode": "Geli Koodka Kicinta",
-  "enterCodePrompt": "Fadlan geli koodka aad ku heshay iimaylka si aad u furto helitaan buuxa.",
+  "enterCodePrompt": "Fadlan geli koodka kicinta ee aad heshay si aad u furto abka oo dhan.",
   "activationCode": "Koodka Kicinta",
-  "activate": "Kici",
-  "invalidCode": "Kood khaldan. Fadlan isku day mar kale.",
+
+  // Create Course Modal
+  "createCourseModalTitle": "Abuur Kooras Cusub",
+  "createCourseModalPrompt": "Mawduuc noocee ah ayaad jeclaan lahayd inaad wax ka barato? AI-gayagu wuxuu kuu soo saari doonaa koorso gaar ah.",
+  "courseTopic": "Mawduuca Kooraska",
+  "courseTopicPlaceholder": "tusaale, 'Aasaaska Quantum Computing'",
+  "courseFormat": "Qaabka Kooraska",
+  "textFormat": "Qoraal",
+  "videoFormat": "Muuqaal",
+  "audioFormat": "Maqal",
+  "createCourseButton": "Abuur Kooras",
   
   // Footer
   "footerRights": "Geeddi Akadeemiyada Barashada AI. Xuquuqda oo dhan way xifdisan tahay.",

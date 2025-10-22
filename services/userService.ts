@@ -1,87 +1,97 @@
-import { User, UserData, CourseProgress } from '../types';
+import { UserProgress, CourseProgress, GeneratedCourseContent } from '../types';
 
-const STORAGE_KEY = 'geeddi-user-data';
-const GUEST_USER_KEY = 'GUEST_USER';
-const ACTIVATION_CODE = 'GEEDDI-ACCESS-2024'; // Hardcoded activation code as requested
+const PROGRESS_STORAGE_KEY = 'geeddi-progress';
+const DOWNLOADED_COURSES_KEY = 'geeddi-downloaded-courses';
+const COURSE_CACHE_NAME = 'geeddi-course-content-v1';
 
-const getUserStorageKey = (user: User): string => {
-    return user.isGuest ? GUEST_USER_KEY : user.email;
-};
 
-const getAllUserData = (): { [key: string]: UserData } => {
+// --- Progress Management ---
+
+const getProgress = (): UserProgress => {
     try {
-        const allDataRaw = localStorage.getItem(STORAGE_KEY);
-        return allDataRaw ? JSON.parse(allDataRaw) : {};
+        const progressRaw = localStorage.getItem(PROGRESS_STORAGE_KEY);
+        return progressRaw ? JSON.parse(progressRaw) : {};
     } catch (error) {
-        console.error("Failed to parse user data from localStorage", error);
+        console.error("Failed to parse progress data from localStorage", error);
         return {};
     }
 }
 
-const saveAllUserData = (allData: { [key: string]: UserData }): void => {
+const saveAllProgress = (progress: UserProgress): void => {
     try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(allData));
+        localStorage.setItem(PROGRESS_STORAGE_KEY, JSON.stringify(progress));
     } catch (error) {
-        console.error("Failed to save user data to localStorage", error);
+        console.error("Failed to save progress data to localStorage", error);
     }
 };
 
-export const getUserData = (user: User): UserData | null => {
-    const allData = getAllUserData();
-    const userKey = getUserStorageKey(user);
-    return allData[userKey] || null;
+export const loadProgress = (): UserProgress => {
+    return getProgress();
 }
 
-export const loginUser = (user: User): UserData => {
-    const allData = getAllUserData();
-    const userKey = getUserStorageKey(user);
-
-    if (allData[userKey]) {
-        return allData[userKey];
-    }
-
-    const newUserData: UserData = {
-        signUpDate: new Date().toISOString(),
-        isFullyActivated: false,
-        progress: {},
-    };
-
-    allData[userKey] = newUserData;
-    saveAllUserData(allData);
-    return newUserData;
+export const saveCourseProgress = (courseId: string, courseProgress: CourseProgress): UserProgress => {
+    const allProgress = getProgress();
+    allProgress[courseId] = courseProgress;
+    saveAllProgress(allProgress);
+    return allProgress;
 };
 
-export const saveCourseProgress = (user: User, courseId: string, courseProgress: CourseProgress): UserData => {
-    const allData = getAllUserData();
-    const userKey = getUserStorageKey(user);
 
-    if (!allData[userKey]) {
-        // This case should ideally not happen if loginUser is always called first
-        allData[userKey] = {
-            signUpDate: new Date().toISOString(),
-            isFullyActivated: false,
-            progress: {},
-        };
-    }
+// --- Offline Caching Management ---
 
-    allData[userKey].progress[courseId] = courseProgress;
-    saveAllUserData(allData);
-    return allData[userKey];
+export const getDownloadedCourseIds = (): Set<string> => {
+    const idsJson = localStorage.getItem(DOWNLOADED_COURSES_KEY);
+    return idsJson ? new Set(JSON.parse(idsJson)) : new Set();
 };
 
-export const activateUserWithCode = (user: User, code: string): boolean => {
-    if (code !== ACTIVATION_CODE) {
-        return false;
+const saveDownloadedCourseIds = (ids: Set<string>): void => {
+    localStorage.setItem(DOWNLOADED_COURSES_KEY, JSON.stringify(Array.from(ids)));
+};
+
+export const addDownloadedCourseId = (courseId: string): void => {
+    const ids = getDownloadedCourseIds();
+    ids.add(courseId);
+    saveDownloadedCourseIds(ids);
+};
+
+export const cacheCourseContent = async (courseId: string, content: GeneratedCourseContent): Promise<void> => {
+    try {
+        const cache = await caches.open(COURSE_CACHE_NAME);
+        const response = new Response(JSON.stringify(content));
+        await cache.put(`/course/${courseId}`, response);
+    } catch (error) {
+        console.error("Failed to cache course content:", error);
     }
+};
 
-    const allData = getAllUserData();
-    const userKey = getUserStorageKey(user);
-
-    if (allData[userKey]) {
-        allData[userKey].isFullyActivated = true;
-        saveAllUserData(allData);
-        return true;
+export const getCachedCourseContent = async (courseId: string): Promise<GeneratedCourseContent | null> => {
+    try {
+        const cache = await caches.open(COURSE_CACHE_NAME);
+        const response = await cache.match(`/course/${courseId}`);
+        return response ? response.json() : null;
+    } catch (error) {
+        console.error("Failed to retrieve cached course content:", error);
+        return null;
     }
+};
 
-    return false;
+export const cacheCourseAudio = async (courseId: string, audioBlob: Blob): Promise<void> => {
+    try {
+        const cache = await caches.open(COURSE_CACHE_NAME);
+        const response = new Response(audioBlob, { headers: { 'Content-Type': 'audio/wav' } });
+        await cache.put(`/audio/${courseId}`, response);
+    } catch (error) {
+        console.error("Failed to cache course audio:", error);
+    }
+};
+
+export const getCachedCourseAudio = async (courseId: string): Promise<Blob | null> => {
+    try {
+        const cache = await caches.open(COURSE_CACHE_NAME);
+        const response = await cache.match(`/audio/${courseId}`);
+        return response ? response.blob() : null;
+    } catch (error) {
+        console.error("Failed to retrieve cached course audio:", error);
+        return null;
+    }
 };

@@ -1,20 +1,24 @@
+
+
 import React, { useState, useMemo } from 'react';
-import { User, UserData, Course } from '../types';
+import { UserProgress, Course } from '../types';
 import CourseCard from './CourseCard';
 import { useTranslation } from '../useTranslation';
-import { PlusIcon, SearchIcon } from './IconComponents';
+import { SearchIcon, PlusIcon } from './IconComponents';
 
 interface DashboardProps {
-  user: User;
   onSelectCourse: (courseId: string) => void;
-  userData: UserData | null;
+  onOpenCreateModal: () => void;
+  userProgress: UserProgress;
   courses: Course[];
-  onAddCourse: () => void;
+  downloadedCourses: Set<string>;
+  preparingCourses: Set<string>;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ user, onSelectCourse, userData, courses, onAddCourse }) => {
+const Dashboard: React.FC<DashboardProps> = ({ onSelectCourse, onOpenCreateModal, userProgress, courses, downloadedCourses, preparingCourses }) => {
   const t = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
+  const name = useTranslation()('learner');
 
   const filteredCourses = useMemo(() => {
     if (!searchQuery) {
@@ -28,7 +32,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onSelectCourse, userData, c
 
   return (
     <div className="animate-fade-in">
-      <h2 className="text-4xl font-extrabold mb-2 text-white">{t('welcomeBack', { name: user.name })}</h2>
+      <h2 className="text-4xl font-extrabold mb-2 text-white">{t('welcomeBack', { name })}</h2>
       <p className="text-lg text-gray-400 mb-8">{t('dashboardSubtitle')}</p>
       
       <div className="relative mb-8">
@@ -45,31 +49,36 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onSelectCourse, userData, c
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {filteredCourses.length > 0 ? (
-            filteredCourses.map(course => {
-              const progress = userData?.progress[course.id]?.progressPercentage || 0;
-              return (
-                <CourseCard
-                  key={course.id}
-                  course={course}
-                  onClick={() => onSelectCourse(course.id)}
-                  progress={progress}
-                />
-              );
-            })
-        ) : (
-            <div className="md:col-span-2 lg:col-span-3 text-center py-10">
+        {filteredCourses.map(course => {
+          const progress = userProgress[course.id]?.progressPercentage || 0;
+          const isDownloaded = downloadedCourses.has(course.id);
+          const isPreparing = preparingCourses.has(course.id);
+          return (
+            <CourseCard
+              key={course.id}
+              course={course}
+              onClick={() => onSelectCourse(course.id)}
+              progress={progress}
+              isDownloaded={isDownloaded}
+              isPreparing={isPreparing}
+            />
+          );
+        })}
+
+        {/* Add New Course Card */}
+        <div
+          onClick={onOpenCreateModal}
+          className="bg-gray-800/50 border-2 border-dashed border-gray-600 rounded-xl shadow-lg transform transition-all duration-300 flex flex-col justify-center items-center p-6 text-gray-400 hover:text-white hover:border-cyan-500 cursor-pointer hover:bg-gray-800"
+        >
+            <PlusIcon />
+            <span className="mt-2 font-semibold text-center">{t('createCourseModalTitle')}</span>
+        </div>
+
+        {searchQuery && filteredCourses.length === 0 && (
+            <div className="md:col-span-2 text-center py-10">
                 <p className="text-gray-400">{t('noCoursesFound')}</p>
             </div>
         )}
-        <div
-          onClick={onAddCourse}
-          className="bg-gray-800 rounded-xl border-2 border-dashed border-gray-600 hover:border-cyan-500 hover:bg-gray-700/50 flex flex-col justify-center items-center p-6 text-center transform hover:-translate-y-2 transition-all duration-300 cursor-pointer"
-        >
-          <PlusIcon />
-          <h3 className="text-xl font-bold mt-4 text-white">{t('createYourOwnCourse')}</h3>
-          <p className="text-gray-400 mt-2 text-sm">{t('createCourseDescription')}</p>
-        </div>
       </div>
     </div>
   );
