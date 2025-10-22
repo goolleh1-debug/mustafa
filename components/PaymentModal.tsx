@@ -35,6 +35,9 @@ const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, onConfirm,
                             amount: {
                                 value: '9.99', // Fixed price for demonstration
                                 currency_code: 'USD'
+                            },
+                            payee: {
+                                email_address: 'ciwaankamustafa@gmail.com' // User-provided PayPal email
                             }
                         }]
                     });

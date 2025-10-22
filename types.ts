@@ -1,23 +1,36 @@
 import React from 'react';
 
-export enum CourseFormat {
-  TEXT = 'TEXT',
-  VIDEO = 'VIDEO',
-  AUDIO = 'AUDIO',
-}
-
 export interface User {
   name: string;
   email: string;
   isGuest?: boolean;
 }
 
+export enum CourseTier {
+  FREE = 'FREE',
+  PREMIUM = 'PREMIUM',
+}
+
+export enum CourseFormat {
+  TEXT = 'TEXT',
+  VIDEO = 'VIDEO',
+  AUDIO = 'AUDIO',
+}
+
 export interface Course {
   id: string;
   title: string;
   description: string;
+  tier: CourseTier;
   icon: React.ReactNode;
   format: CourseFormat;
+}
+
+export enum View {
+    LANDING,
+    LOGIN,
+    DASHBOARD,
+    COURSE
 }
 
 export interface CourseModule {
@@ -32,17 +45,11 @@ export interface QuizQuestion {
     correctAnswer: string;
 }
 
-export interface GroundingSource {
-  uri: string;
-  title: string;
-}
-
 export interface GeneratedCourseContent {
   introduction: string;
   modules: CourseModule[];
   summary: string;
   quiz: QuizQuestion[];
-  sources?: GroundingSource[];
 }
 
 export interface CourseProgress {
@@ -50,9 +57,14 @@ export interface CourseProgress {
   quizSubmitted: boolean;
   quizScore?: number;
   progressPercentage: number;
-  completedSteps?: number[];
 }
 
 export interface UserProgress {
   [courseId: string]: CourseProgress;
+}
+
+export interface UserData {
+  signUpDate: string; // ISO string
+  isFullyActivated: boolean;
+  progress: UserProgress;
 }

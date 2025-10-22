@@ -1,14 +1,14 @@
 import React, { useRef } from 'react';
-import { Course } from '../types';
+import { User, Course } from '../types';
 import { useTranslation } from '../useTranslation';
 
 interface CertificateProps {
-  userName: string;
+  user: User;
   course: Course;
   onClose: () => void;
 }
 
-const Certificate: React.FC<CertificateProps> = ({ userName, course, onClose }) => {
+const Certificate: React.FC<CertificateProps> = ({ user, course, onClose }) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const t = useTranslation();
 
@@ -54,7 +54,7 @@ const Certificate: React.FC<CertificateProps> = ({ userName, course, onClose }) 
     <div className="fixed inset-0 bg-black bg-opacity-75 backdrop-blur-sm flex justify-center items-center z-50 animate-fade-in p-4">
       <div className="bg-gray-800 rounded-lg shadow-2xl w-full max-w-4xl transform transition-all animate-slide-up relative">
         <button onClick={onClose} className="absolute top-2 right-2 text-gray-400 hover:text-white bg-gray-700 rounded-full h-8 w-8 flex items-center justify-center z-10" aria-label="Close">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24" stroke="currentColor">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
@@ -79,7 +79,7 @@ const Certificate: React.FC<CertificateProps> = ({ userName, course, onClose }) 
             </text>
             
             <text x="400" y="310" textAnchor="middle" fontSize="44" fill="#000" fontWeight="bold" style={{ fontFamily: 'Georgia, serif' }}>
-              {userName}
+              {user.name}
             </text>
 
             <text x="400" y="360" textAnchor="middle" fontSize="22" fill="#555" fontStyle="italic" style={{ fontFamily: 'Georgia, serif' }}>
