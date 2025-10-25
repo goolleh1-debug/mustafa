@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { User, Course, View, CourseProgress, UserData, CourseTier, CourseFormat } from './types';
 import { COURSES } from './constants';
-import { loginUser, saveCourseProgress as saveProgress, getUserData, activateUserWithCode } from './services/userService';
+import { loginUser, saveCourseProgress as saveProgress, getUserData, activateUserWithCode, unlockCourseForUser } from './services/userService';
 import LandingPage from './components/LandingPage';
 import LoginScreen from './components/LoginScreen';
 import Dashboard from './components/Dashboard';
@@ -11,6 +11,7 @@ import Footer from './components/Footer';
 import RequestAccessView from './components/RequestAccessView';
 import EnterCodeModal from './components/EnterCodeModal';
 import CreateCourseModal from './components/CreateCourseModal';
+import PaymentModal from './components/PaymentModal';
 import { BrainIcon, VideoIcon, AudioIcon, CodeIcon } from './components/IconComponents';
 import { useTranslation } from './useTranslation';
 
@@ -21,6 +22,8 @@ const App: React.FC = () => {
   const [userData, setUserData] = useState<UserData | null>(null);
   const [isCodeModalOpen, setIsCodeModalOpen] = useState(false);
   const [isCreateCourseModalOpen, setIsCreateCourseModalOpen] = useState(false);
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [courseForPayment, setCourseForPayment] = useState<Course | null>(null);
   const [courses, setCourses] = useState<Course[]>(COURSES);
   const t = useTranslation();
 
@@ -40,11 +43,6 @@ const App: React.FC = () => {
     setUserData(null);
     setCurrentView(View.LOGIN);
     setSelectedCourseId(null);
-  }, []);
-
-  const handleSelectCourse = useCallback((courseId: string) => {
-    setSelectedCourseId(courseId);
-    setCurrentView(View.COURSE);
   }, []);
 
   const handleBackToDashboard = useCallback(() => {
@@ -112,6 +110,34 @@ const App: React.FC = () => {
   
   const isFullyActivated = userData?.isFullyActivated ?? false;
   const canAccessContent = isTrialActive || isFullyActivated;
+  
+  const handleSelectCourse = useCallback((courseId: string) => {
+    const course = courses.find(c => c.id === courseId);
+    if (!course) return;
+
+    const hasPurchased = (userData?.purchasedCourses || []).includes(courseId);
+    const hasAccess = course.tier === CourseTier.FREE || hasPurchased;
+
+    if (canAccessContent && hasAccess) {
+        setSelectedCourseId(courseId);
+        setCurrentView(View.COURSE);
+    } else if (canAccessContent && course.tier === CourseTier.PREMIUM) {
+        setCourseForPayment(course);
+        setIsPaymentModalOpen(true);
+    } else if (!canAccessContent) {
+        // If trial has expired, they can't access anything, the dashboard view will show the request access view.
+        // No special action needed here.
+    }
+  }, [courses, userData, canAccessContent]);
+
+  const handlePaymentSuccess = useCallback(() => {
+    if (!user || !courseForPayment) return;
+    const updatedUserData = unlockCourseForUser(user, courseForPayment.id);
+    setUserData(updatedUserData);
+    setSelectedCourseId(courseForPayment.id);
+    setCurrentView(View.COURSE);
+  }, [user, courseForPayment]);
+
 
   useEffect(() => {
     if(user){
@@ -186,6 +212,16 @@ const App: React.FC = () => {
         onClose={() => setIsCreateCourseModalOpen(false)}
         onCreate={handleCreateCourse}
       />
+       {courseForPayment && user && (
+            <PaymentModal
+                isOpen={isPaymentModalOpen}
+                onClose={() => setIsPaymentModalOpen(false)}
+                onConfirm={handlePaymentSuccess}
+                courseTitle={courseForPayment.title}
+                user={user}
+                onLogout={handleLogout}
+            />
+        )}
     </div>
   );
 };

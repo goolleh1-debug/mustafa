@@ -1,14 +1,16 @@
 import React from 'react';
 import { Course, CourseTier, CourseFormat } from '../types';
 import { useTranslation } from '../useTranslation';
+import { LockIcon } from './IconComponents';
 
 interface CourseCardProps {
   course: Course;
   onClick: () => void;
   progress: number;
+  hasAccess: boolean;
 }
 
-const CourseCard: React.FC<CourseCardProps> = ({ course, onClick, progress }) => {
+const CourseCard: React.FC<CourseCardProps> = ({ course, onClick, progress, hasAccess }) => {
   const t = useTranslation();
 
   const getFormatTag = () => {
@@ -20,7 +22,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, onClick, progress }) =>
       case CourseFormat.TEXT:
          return <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-900 text-blue-300">{t('text')}</span>;
       default:
-        return <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-cyan-900 text-cyan-300">{t('free')}</span>;
+        return null;
     }
   }
 
@@ -31,9 +33,17 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, onClick, progress }) =>
     >
       <div className="p-6 flex-grow flex flex-col">
         <div>
-          <div className="flex justify-between items-start">
+           <div className="flex justify-between items-start">
               {course.icon}
-              {getFormatTag()}
+              <div className="flex items-center gap-2">
+                {course.tier === CourseTier.PREMIUM && !hasAccess && (
+                    <span className="flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full bg-yellow-900 text-yellow-300">
+                       <LockIcon className="h-3 w-3" />
+                       {t('premium')}
+                    </span>
+                )}
+                {getFormatTag()}
+              </div>
           </div>
           <h3 className="text-xl font-bold mt-4 text-white">{course.title}</h3>
           <p className="text-gray-400 mt-2 text-sm">{course.description}</p>

@@ -67,4 +67,5 @@ export interface UserData {
   signUpDate: string; // ISO string
   isFullyActivated: boolean;
   progress: UserProgress;
+  purchasedCourses?: string[];
 }

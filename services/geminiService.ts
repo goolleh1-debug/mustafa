@@ -3,10 +3,10 @@ import { GoogleGenAI, Type } from "@google/genai";
 import { GeneratedCourseContent, CourseFormat } from '../types';
 
 if (!process.env.API_KEY) {
-  throw new Error("API_KEY environment variable is not set");
+  console.warn("API_KEY environment variable is not set. Using a placeholder key.");
 }
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || 'YOUR_API_KEY_HERE' });
 
 const courseContentSchema = {
   type: Type.OBJECT,

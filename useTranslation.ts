@@ -11,6 +11,7 @@ const en = {
   "audio": "AUDIO",
   "text": "TEXT",
   "free": "FREE",
+  "premium": "PREMIUM",
   "locale": "en-US",
 
   // Landing Page
@@ -120,6 +121,7 @@ const so: typeof en = {
   "audio": "MAQAL",
   "text": "QORAAL",
   "free": "BILAASH",
+  "premium": "QIIMO LEH",
   "locale": "so-SO",
   
   // Landing Page

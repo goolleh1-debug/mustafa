@@ -34,7 +34,6 @@ const CourseView: React.FC<CourseViewProps> = ({ course, user, onBack, initialPr
     const timeouts: number[] = [];
     const clearTimeouts = () => timeouts.forEach(clearTimeout);
 
-    // Set up detailed progress messages for media formats
     if (course.format === CourseFormat.VIDEO || course.format === CourseFormat.AUDIO) {
       setLoadingMessage(t('generatingIntroduction'));
       timeouts.push(window.setTimeout(() => setLoadingMessage(t('creatingModules')), 2000));
@@ -97,14 +96,7 @@ const CourseView: React.FC<CourseViewProps> = ({ course, user, onBack, initialPr
     if(course.format === CourseFormat.VIDEO) {
         return (
              <div className="aspect-w-16 aspect-h-9 mb-8 bg-black rounded-lg overflow-hidden shadow-lg">
-                <iframe 
-                    src="https://www.youtube.com/embed/S_QyEZ8v1F4?si=PZ1b98p-Fk0L-8Uu" // Placeholder AI/Tech video
-                    title="YouTube video player" 
-                    frameBorder="0" 
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                    allowFullScreen
-                    className="w-full h-full"
-                ></iframe>
+                <div className="w-full h-full flex items-center justify-center text-gray-400">Video Player Placeholder</div>
             </div>
         )
     }
@@ -112,7 +104,6 @@ const CourseView: React.FC<CourseViewProps> = ({ course, user, onBack, initialPr
         return (
              <div className="mb-8 bg-gray-800 p-4 rounded-lg shadow-lg">
                 <audio controls className="w-full">
-                    {/* Placeholder audio */}
                     <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg" />
                     {t('browserNoSupportAudio')}
                 </audio>

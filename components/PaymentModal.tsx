@@ -35,9 +35,6 @@ const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, onConfirm,
                             amount: {
                                 value: '9.99', // Fixed price for demonstration
                                 currency_code: 'USD'
-                            },
-                            payee: {
-                                email_address: 'ciwaankamustafa@gmail.com' // User-provided PayPal email
                             }
                         }]
                     });
@@ -47,13 +44,13 @@ const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, onConfirm,
                     try {
                         const order = await actions.order.capture();
                         console.log('Payment successful:', order);
-                        setPaymentState('success');
-                        onConfirm();
+                        setPaymentState('success'); // Show success message UI
 
+                        // After a delay, unlock the course, navigate, and close the modal
                         setTimeout(() => {
-                            onClose();
-                            setTimeout(() => setPaymentState('idle'), 300); // Reset state after closing
-                        }, 2000); // Show success message for 2s
+                            onConfirm(); // This unlocks the course and navigates
+                            onClose();   // This removes the modal component
+                        }, 2000); // Wait 2 seconds while showing the success message
                     } catch(err) {
                         console.error('Failed to capture payment:', err);
                         setPaymentState('idle'); // Return to idle on capture failure

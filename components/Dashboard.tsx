@@ -48,12 +48,14 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onSelectCourse, userData, c
         {filteredCourses.length > 0 ? (
             filteredCourses.map(course => {
               const progress = userData?.progress[course.id]?.progressPercentage || 0;
+              const hasAccess = course.tier === 'FREE' || (userData?.purchasedCourses || []).includes(course.id);
               return (
                 <CourseCard
                   key={course.id}
                   course={course}
                   onClick={() => onSelectCourse(course.id)}
                   progress={progress}
+                  hasAccess={hasAccess}
                 />
               );
             })
