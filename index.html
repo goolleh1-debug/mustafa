@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Geeddi - AI Learning Academy</title>
     <meta name="theme-color" content="#111827" />
-    <link rel="manifest" href="manifest.json" />
+    <link rel="manifest" href="/manifest.json" />
     <link rel="apple-touch-icon" href="/vite.svg" />
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -48,8 +48,7 @@
     "react/": "https://aistudiocdn.com/react@^19.2.0/"
   }
 }
-</script>
-<script>
+</script><script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js').then(registration => {
@@ -59,8 +58,7 @@
         });
       });
     }
-  </script>
-</head>
+  </script></head>
   <body class="bg-gray-900 text-white">
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
